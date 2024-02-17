@@ -22,7 +22,7 @@ final public class InAppPurchase: NSObject, ObservableObject {
         !self.purchasedProductIDs.isEmpty
     }
 
-    override init() {
+    override public init() {
         super.init()
         self.updates = observeTransactionUpdates()
         SKPaymentQueue.default().add(self)
