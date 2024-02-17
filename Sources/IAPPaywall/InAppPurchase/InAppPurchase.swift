@@ -16,7 +16,6 @@ final public class InAppPurchase: NSObject, ObservableObject {
 
     private var updates: Task<Void, Never>? = nil
     private var productsLoaded = false
-    private var subscriptionProducts: [SubscriptionProduct] = []
 
     var hasPurchased: Bool {
         !self.purchasedProductIDs.isEmpty
@@ -32,14 +31,12 @@ final public class InAppPurchase: NSObject, ObservableObject {
         updates?.cancel()
     }
     
-    func setSubscriptionProducts(_ products: [SubscriptionProduct]) {
-        self.subscriptionProducts = products
-    }
-
-    public func loadProducts() async throws {
+    func setSubscriptionProducts(_ subscriptionProducts: [SubscriptionProduct]) {
         guard !self.productsLoaded else { return }
-        self.products = try await Product.products(for: subscriptionProducts.map({ $0.productId }))
-        self.productsLoaded = true
+        Task {
+            self.products = try await Product.products(for: subscriptionProducts.map({ $0.productId }))
+            self.productsLoaded = true
+        }
     }
 
     public func purchase(_ productId: String) async throws -> PurchaseResult {
