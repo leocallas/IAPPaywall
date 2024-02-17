@@ -7,13 +7,13 @@
 
 import Foundation
 
-enum PurchaseResult {
+public enum PurchaseResult {
     case success(VerificationResult)
     case pending
     case userCancelled
     case unknownError
     
-    enum VerificationResult {
+    public enum VerificationResult {
         case verified
         case unverified(Error?)
     }

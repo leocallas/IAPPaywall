@@ -36,13 +36,13 @@ final public class InAppPurchase: NSObject, ObservableObject {
         self.subscriptionProducts = products
     }
 
-    func loadProducts() async throws {
+    public func loadProducts() async throws {
         guard !self.productsLoaded else { return }
         self.products = try await Product.products(for: subscriptionProducts.map({ $0.productId }))
         self.productsLoaded = true
     }
 
-    func purchase(_ productId: String) async throws -> PurchaseResult {
+    public func purchase(_ productId: String) async throws -> PurchaseResult {
         let product = products.first(where: { $0.id == productId })
         let result = try await product?.purchase()
         
@@ -65,7 +65,7 @@ final public class InAppPurchase: NSObject, ObservableObject {
         }
     }
 
-    func updatePurchasedProducts() async {
+    public func updatePurchasedProducts() async {
         for await result in Transaction.currentEntitlements {
             guard case .verified(let transaction) = result else {
                 continue
@@ -79,7 +79,7 @@ final public class InAppPurchase: NSObject, ObservableObject {
         }
     }
     
-    func restore() async -> Bool {
+    public func restore() async -> Bool {
         ((try? await AppStore.sync()) != nil)
     }
 
