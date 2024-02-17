@@ -16,7 +16,7 @@ struct IAPPaywallPointView: View {
             ZStack {
                 point.icon
                     .resizable()
-                    .frame(width: 25, height: 25)
+                    .frame(width: 17, height: 17)
             }
             
             Text(point.title)

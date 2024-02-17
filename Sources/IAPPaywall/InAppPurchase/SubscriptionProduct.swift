@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct SubscriptionPeriod {
+struct SubscriptionProduct {
     var title: String
     var description: String
     var productId: String

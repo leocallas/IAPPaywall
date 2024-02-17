@@ -6,3 +6,15 @@
 //
 
 import Foundation
+
+enum PurchaseResult {
+    case success(VerificationResult)
+    case pending
+    case userCancelled
+    case unknownError
+    
+    enum VerificationResult {
+        case verified
+        case unverified(Error?)
+    }
+}
