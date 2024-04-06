@@ -3,7 +3,7 @@
 
 import SwiftUI
 
-struct IAPPaywallView: View {
+public struct IAPPaywallView: View {
 
     @Binding var model: IAPPaywallModel
     @State var selectedPlan: IAPPaywallModel.Plan?

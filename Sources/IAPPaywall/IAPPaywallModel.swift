@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct IAPPaywallModel {
+public struct IAPPaywallModel {
     var title: Title
     var subTitle: SubTitle?
     var header: Header
