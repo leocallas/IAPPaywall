@@ -103,8 +103,7 @@ public struct IAPPaywallModel {
         public var font: Font = .body
         public var color: Color = .black
         
-        public init(id: UUID, icon: Image, title: String, font: Font, color: Color) {
-            self.id = id
+        public init(icon: Image, title: String, font: Font, color: Color) {
             self.icon = icon
             self.title = title
             self.font = font
@@ -121,8 +120,7 @@ public struct IAPPaywallModel {
         public var separatorSymbolColor: Color = Color.gray.opacity(0.7)
         public var action: (() -> Void)
         
-        public init(id: UUID, title: String, titleFont: Font, titleColor: Color, separatorSymbol: String, separatorSymbolColor: Color, action: @escaping () -> Void) {
-            self.id = id
+        public init(title: String, titleFont: Font, titleColor: Color, separatorSymbol: String, separatorSymbolColor: Color, action: @escaping () -> Void) {
             self.title = title
             self.titleFont = titleFont
             self.titleColor = titleColor
