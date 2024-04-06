@@ -33,13 +33,13 @@ public struct IAPPaywallView: View {
 }
 
 extension IAPPaywallView {
-    func onPurchase(perform action: @escaping (PurchaseResult) -> Void) -> Self {
+    public func onPurchase(perform action: @escaping (PurchaseResult) -> Void) -> Self {
         var copy = self
         copy.onPurchase = action
         return copy
     }
     
-    func onRestore(perform action: @escaping (Bool) -> Void) -> Self {
+    public func onRestore(perform action: @escaping (Bool) -> Void) -> Self {
         var copy = self
         copy.onRestore = action
         return copy
