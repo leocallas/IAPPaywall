@@ -8,107 +8,107 @@
 import SwiftUI
 
 public struct IAPPaywallModel {
-    var title: Title
-    var subTitle: SubTitle?
-    var header: Header
-    var points: [Point]?
-    var payButton: PayButton
-    var footerLinks: [FooterLink] = []
-    var plans: [Plan]
+    public var title: Title
+    public var subTitle: SubTitle?
+    public var header: Header
+    public var points: [Point]?
+    public var payButton: PayButton
+    public var footerLinks: [FooterLink] = []
+    public var plans: [Plan]
     
-    struct Title {
-        var title: String
-        var font: Font = .largeTitle.bold()
-        var color: Color = .black
+    public struct Title {
+        public var title: String
+        public var font: Font = .largeTitle.bold()
+        public var color: Color = .black
     }
 
-    struct SubTitle {
-        var subTitle: String
-        var font: Font = .body
-        var color: Color = .black
+    public struct SubTitle {
+        public var subTitle: String
+        public var font: Font = .body
+        public var color: Color = .black
     }
 
-    struct Header {
-        var title: String
-        var font: Font = .body
-        var color: Color = .black
-        var image: Image?
-        var isSticky: Bool = true
-        var isStretchy: Bool = true
+    public struct Header {
+        public var title: String
+        public var font: Font = .body
+        public var color: Color = .black
+        public var image: Image?
+        public var isSticky: Bool = true
+        public var isStretchy: Bool = true
     }
 
-    struct PayButton {
-        var title: String
-        var titleColor: Color = .white
-        var font: Font = .body
-        var backgroundColor: Color = .black
-        var caption: Caption?
+    public struct PayButton {
+        public var title: String
+        public var titleColor: Color = .white
+        public var font: Font = .body
+        public var backgroundColor: Color = .black
+        public var caption: Caption?
         
-        struct Caption {
-            var title: String
-            var font: Font = .caption
-            var color: Color = .gray
+        public struct Caption {
+            public var title: String
+            public var font: Font = .caption
+            public var color: Color = .gray
         }
     }
 
-    struct Point: Identifiable {
-        var id: UUID = UUID()
-        var icon: Image = .init("checkmark", bundle: .module)
-        var title: String
-        var font: Font = .body
-        var color: Color = .black
+    public struct Point: Identifiable {
+        public var id: UUID = UUID()
+        public var icon: Image = .init("checkmark", bundle: .module)
+        public var title: String
+        public var font: Font = .body
+        public var color: Color = .black
     }
 
-    struct FooterLink: Identifiable, Hashable {
-        var id: UUID = UUID()
-        var title: String
-        var titleFont: Font = .caption
-        var titleColor: Color = .black
-        var separatorSymbol: String = "•"
-        var separatorSymbolColor: Color = Color.gray.opacity(0.7)
-        var action: (() -> Void)
+    public struct FooterLink: Identifiable, Hashable {
+        public var id: UUID = UUID()
+        public var title: String
+        public var titleFont: Font = .caption
+        public var titleColor: Color = .black
+        public var separatorSymbol: String = "•"
+        public var separatorSymbolColor: Color = Color.gray.opacity(0.7)
+        public var action: (() -> Void)
         
-        func hash(into hasher: inout Hasher) {
+        public func hash(into hasher: inout Hasher) {
             return hasher.combine(id)
         }
         
-        static func == (lhs: IAPPaywallModel.FooterLink, rhs: IAPPaywallModel.FooterLink) -> Bool {
+        static public func == (lhs: IAPPaywallModel.FooterLink, rhs: IAPPaywallModel.FooterLink) -> Bool {
             lhs.id == rhs.id
         }
     }
 
-    struct Plan: Identifiable, Hashable {
-        var id: String
-        var iconColor: Color = .black
-        var title: Title
-        var subTitle: SubTitle
-        var promotion: Promo?
-        var selectedBorderColor: Color = .black
+    public struct Plan: Identifiable, Hashable {
+        public var id: String
+        public var iconColor: Color = .black
+        public var title: Title
+        public var subTitle: SubTitle
+        public var promotion: Promo?
+        public var selectedBorderColor: Color = .black
 
-        struct Title {
+        public struct Title {
             var title: String
             var color: Color = .black
             var font: Font = .body.bold()
         }
         
-        struct SubTitle {
+        public struct SubTitle {
             var title: String
             var color: Color = .black
             var font: Font = .body
         }
         
-        struct Promo {
+        public struct Promo {
             var title: String
             var titleColor: Color = .white
             var font: Font = .caption
             var backgroundColor: Color? = .black
         }
 
-        func hash(into hasher: inout Hasher) {
+        public func hash(into hasher: inout Hasher) {
             return hasher.combine(id)
         }
 
-        static func == (lhs: IAPPaywallModel.Plan, rhs: IAPPaywallModel.Plan) -> Bool {
+        static public func == (lhs: IAPPaywallModel.Plan, rhs: IAPPaywallModel.Plan) -> Bool {
             lhs.id == rhs.id
         }
     }
