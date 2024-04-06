@@ -8,15 +8,23 @@
 import SwiftUI
 
 public struct IAPPaywallModel {
-    public var title: Title
-    public var subTitle: SubTitle?
-    public var header: Header
-    public var points: [Point]?
-    public var payButton: PayButton
-    public var footerLinks: [FooterLink] = []
-    public var plans: [Plan]
+    var title: Title
+    var subTitle: SubTitle?
+    var header: Header
+    var points: [Point]?
+    var payButton: PayButton
+    var footerLinks: [FooterLink] = []
+    var plans: [Plan]
     
-    public init(title: Title, subTitle: SubTitle? = nil, header: Header, points: [Point]? = nil, payButton: PayButton, footerLinks: [FooterLink], plans: [Plan]) {
+    public init(
+        title: Title,
+        subTitle: SubTitle? = nil,
+        header: Header,
+        points: [Point]? = nil,
+        payButton: PayButton,
+        footerLinks: [FooterLink], 
+        plans: [Plan]
+    ) {
         self.title = title
         self.subTitle = subTitle
         self.header = header
@@ -27,11 +35,15 @@ public struct IAPPaywallModel {
     }
 
     public struct Title {
-        public var title: String
-        public var font: Font = .largeTitle.bold()
-        public var color: Color = .black
+        var title: String
+        var font: Font = .largeTitle.bold()
+        var color: Color = .black
 
-        public init(title: String, font: Font, color: Color) {
+        public init(
+            title: String,
+            font: Font = .largeTitle.bold(),
+            color: Color = .black
+        ) {
             self.title = title
             self.font = font
             self.color = color
@@ -39,11 +51,15 @@ public struct IAPPaywallModel {
     }
 
     public struct SubTitle {
-        public var subTitle: String
-        public var font: Font = .body
-        public var color: Color = .black
+        var subTitle: String
+        var font: Font = .body
+        var color: Color = .black
         
-        public init(subTitle: String, font: Font, color: Color) {
+        public init(
+            subTitle: String,
+            font: Font = .body,
+            color: Color = .black
+        ) {
             self.subTitle = subTitle
             self.font = font
             self.color = color
@@ -51,14 +67,21 @@ public struct IAPPaywallModel {
     }
 
     public struct Header {
-        public var title: String
-        public var font: Font = .body
-        public var color: Color = .black
-        public var image: Image?
-        public var isSticky: Bool = true
-        public var isStretchy: Bool = true
+        var title: String
+        var font: Font = .body
+        var color: Color = .black
+        var image: Image?
+        var isSticky: Bool = true
+        var isStretchy: Bool = true
         
-        public init(title: String, font: Font, color: Color, image: Image? = nil, isSticky: Bool, isStretchy: Bool) {
+        public init(
+            title: String,
+            font: Font = .body,
+            color: Color = .black,
+            image: Image? = nil,
+            isSticky: Bool = true,
+            isStretchy: Bool = true
+        ) {
             self.title = title
             self.font = font
             self.color = color
@@ -69,13 +92,19 @@ public struct IAPPaywallModel {
     }
 
     public struct PayButton {
-        public var title: String
-        public var titleColor: Color = .white
-        public var font: Font = .body
-        public var backgroundColor: Color = .black
-        public var caption: Caption?
+        var title: String
+        var titleColor: Color = .white
+        var font: Font = .body
+        var backgroundColor: Color = .black
+        var caption: Caption?
         
-        public init(title: String, titleColor: Color, font: Font, backgroundColor: Color, caption: Caption? = nil) {
+        public init(
+            title: String,
+            titleColor: Color,
+            font: Font, 
+            backgroundColor: Color,
+            caption: Caption? = nil
+        ) {
             self.title = title
             self.titleColor = titleColor
             self.font = font
@@ -84,11 +113,15 @@ public struct IAPPaywallModel {
         }
         
         public struct Caption {
-            public var title: String
-            public var font: Font = .caption
-            public var color: Color = .gray
+            var title: String
+            var font: Font = .caption
+            var color: Color = .gray
             
-            public init(title: String, font: Font, color: Color) {
+            public init(
+                title: String,
+                font: Font = .caption,
+                color: Color = .gray
+            ) {
                 self.title = title
                 self.font = font
                 self.color = color
@@ -98,12 +131,17 @@ public struct IAPPaywallModel {
 
     public struct Point: Identifiable {
         public var id: UUID = UUID()
-        public var icon: Image = .init("checkmark", bundle: .module)
-        public var title: String
-        public var font: Font = .body
-        public var color: Color = .black
+        var icon: Image
+        var title: String
+        var font: Font = .body
+        var color: Color = .black
         
-        public init(icon: Image, title: String, font: Font, color: Color) {
+        public init(
+            icon: Image,
+            title: String,
+            font: Font = .body,
+            color: Color = .black
+        ) {
             self.icon = icon
             self.title = title
             self.font = font
@@ -113,14 +151,21 @@ public struct IAPPaywallModel {
 
     public struct FooterLink: Identifiable, Hashable {
         public var id: UUID = UUID()
-        public var title: String
-        public var titleFont: Font = .caption
-        public var titleColor: Color = .black
-        public var separatorSymbol: String = "•"
-        public var separatorSymbolColor: Color = Color.gray.opacity(0.7)
-        public var action: (() -> Void)
+        var title: String
+        var titleFont: Font = .caption
+        var titleColor: Color = .black
+        var separatorSymbol: String = "•"
+        var separatorSymbolColor: Color = Color.gray.opacity(0.7)
+        var action: (() -> Void)
         
-        public init(title: String, titleFont: Font, titleColor: Color, separatorSymbol: String, separatorSymbolColor: Color, action: @escaping () -> Void) {
+        public init(
+            title: String,
+            titleFont: Font = .caption,
+            titleColor: Color = .black,
+            separatorSymbol: String = "•",
+            separatorSymbolColor: Color = Color.gray.opacity(0.7),
+            action: @escaping () -> Void
+        ) {
             self.title = title
             self.titleFont = titleFont
             self.titleColor = titleColor
@@ -140,13 +185,20 @@ public struct IAPPaywallModel {
 
     public struct Plan: Identifiable, Hashable {
         public var id: String
-        public var iconColor: Color = .black
-        public var title: Title
-        public var subTitle: SubTitle
-        public var promotion: Promo?
-        public var selectedBorderColor: Color = .black
+        var iconColor: Color = .black
+        var title: Title
+        var subTitle: SubTitle
+        var promotion: Promo?
+        var selectedBorderColor: Color = .black
         
-        public init(id: String, iconColor: Color, title: Title, subTitle: SubTitle, promotion: Promo? = nil, selectedBorderColor: Color) {
+        public init(
+            id: String,
+            iconColor: Color = .black,
+            title: Title,
+            subTitle: SubTitle,
+            promotion: Promo? = nil,
+            selectedBorderColor: Color = .black
+        ) {
             self.id = id
             self.iconColor = iconColor
             self.title = title
@@ -160,7 +212,11 @@ public struct IAPPaywallModel {
             var color: Color = .black
             var font: Font = .body.bold()
             
-            public init(title: String, color: Color, font: Font) {
+            public init(
+                title: String,
+                color: Color = .black,
+                font: Font = .body.bold()
+            ) {
                 self.title = title
                 self.color = color
                 self.font = font
@@ -172,7 +228,11 @@ public struct IAPPaywallModel {
             var color: Color = .black
             var font: Font = .body
             
-            public init(title: String, color: Color, font: Font) {
+            public init(
+                title: String,
+                color: Color = .black,
+                font: Font = .body
+            ) {
                 self.title = title
                 self.color = color
                 self.font = font
@@ -185,7 +245,12 @@ public struct IAPPaywallModel {
             var font: Font = .caption
             var backgroundColor: Color? = .black
             
-            public init(title: String, titleColor: Color, font: Font, backgroundColor: Color? = nil) {
+            public init(
+                title: String,
+                titleColor: Color = .white,
+                font: Font = .caption,
+                backgroundColor: Color? = .black
+            ) {
                 self.title = title
                 self.titleColor = titleColor
                 self.font = font
