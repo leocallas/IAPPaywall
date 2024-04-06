@@ -5,15 +5,15 @@ import SwiftUI
 
 public struct IAPPaywallView: View {
 
-    @Binding public var model: IAPPaywallModel
+    @State public var model: IAPPaywallModel
     @State var selectedPlan: IAPPaywallModel.Plan?
     @State var hasPurchased: Bool = false
 
     private(set) var onPurchase: ((PurchaseResult) -> Void)?
     private(set) var onRestore: ((Bool) -> Void)?
 
-    public init(model: Binding<IAPPaywallModel>) {
-        self._model = model
+    public init(model: IAPPaywallModel) {
+        self.model = model
     }
 
     public var body: some View {
