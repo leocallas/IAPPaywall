@@ -5,14 +5,14 @@ import SwiftUI
 
 public struct IAPPaywallView: View {
 
-    @Binding var model: IAPPaywallModel
+    @Binding public var model: IAPPaywallModel
     @State var selectedPlan: IAPPaywallModel.Plan?
     @State var hasPurchased: Bool = false
 
     private(set) var onPurchase: ((PurchaseResult) -> Void)?
     private(set) var onRestore: ((Bool) -> Void)?
 
-    var body: some View {
+    public var body: some View {
         ScrollView {
             VStack {
                 IAPPaywallHeaderView(model: $model)
