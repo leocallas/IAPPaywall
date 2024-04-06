@@ -12,6 +12,10 @@ public struct IAPPaywallView: View {
     private(set) var onPurchase: ((PurchaseResult) -> Void)?
     private(set) var onRestore: ((Bool) -> Void)?
 
+    public init(model: Binding<IAPPaywallModel>) {
+        self._model = model
+    }
+
     public var body: some View {
         ScrollView {
             VStack {
