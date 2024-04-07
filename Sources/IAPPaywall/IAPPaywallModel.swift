@@ -67,20 +67,22 @@ public struct IAPPaywallModel {
     }
 
     public struct Header {
-        var title: String
-        var font: Font = .body
-        var color: Color = .black
+        var title: String?
+        var font: Font? = .body
+        var color: Color? = .black
         var image: Image?
         var isSticky: Bool = true
         var isStretchy: Bool = true
-        
+        var shouldShowBlurNavBarOnScroll: Bool = true
+
         public init(
-            title: String,
-            font: Font = .body,
-            color: Color = .black,
+            title: String? = nil,
+            font: Font? = .body,
+            color: Color? = .black,
             image: Image? = nil,
             isSticky: Bool = true,
-            isStretchy: Bool = true
+            isStretchy: Bool = true,
+            shouldShowBlurNavBarOnScroll: Bool = true
         ) {
             self.title = title
             self.font = font
@@ -88,6 +90,7 @@ public struct IAPPaywallModel {
             self.image = image
             self.isSticky = isSticky
             self.isStretchy = isStretchy
+            self.shouldShowBlurNavBarOnScroll = shouldShowBlurNavBarOnScroll
         }
     }
 
@@ -189,6 +192,7 @@ public struct IAPPaywallModel {
         var title: Title
         var subTitle: SubTitle
         var promotion: Promo?
+        var borderColor: Color = .black
         var selectedBorderColor: Color = .black
         
         public init(
@@ -197,6 +201,7 @@ public struct IAPPaywallModel {
             title: Title,
             subTitle: SubTitle,
             promotion: Promo? = nil,
+            borderColor: Color = .black,
             selectedBorderColor: Color = .black
         ) {
             self.id = id
@@ -204,6 +209,7 @@ public struct IAPPaywallModel {
             self.title = title
             self.subTitle = subTitle
             self.promotion = promotion
+            self.borderColor = borderColor
             self.selectedBorderColor = selectedBorderColor
         }
 

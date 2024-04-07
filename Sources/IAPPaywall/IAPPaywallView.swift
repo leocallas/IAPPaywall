@@ -17,22 +17,24 @@ public struct IAPPaywallView: View {
     }
 
     public var body: some View {
-        ScrollView {
-            VStack {
-                IAPPaywallHeaderView(model: $model)
-                IAPPaywallContentView(model: $model, selectedPlan: $selectedPlan)
+        VStack {
+            ScrollView {
+                VStack {
+                    IAPPaywallHeaderView(model: $model)
+                    IAPPaywallContentView(model: $model, selectedPlan: $selectedPlan)
+                }
             }
+            .ignoresSafeArea(.container, edges: .top)
+            .scrollIndicators(.hidden)
+            
+            IAPPaywallFooterView(
+                model: $model,
+                selectedPlan: $selectedPlan,
+                hasPurchased: $hasPurchased,
+                onPurchase: onPurchase,
+                onRestore: onRestore
+            )
         }
-        .ignoresSafeArea(.container, edges: .top)
-        .scrollIndicators(.hidden)
-
-        IAPPaywallFooterView(
-            model: $model,
-            selectedPlan: $selectedPlan,
-            hasPurchased: $hasPurchased,
-            onPurchase: onPurchase,
-            onRestore: onRestore
-        )
     }
 }
 

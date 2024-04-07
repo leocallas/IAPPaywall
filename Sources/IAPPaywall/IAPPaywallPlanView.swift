@@ -57,19 +57,7 @@ struct IAPPaywallPlanView: View {
         .frame(height: 80)
         .overlay(
             RoundedRectangle(cornerRadius: 15)
-                .stroke(plan.selectedBorderColor, lineWidth: 2)
-                .opacity(isSelected ? 1 : 0.3)
+                .stroke(isSelected ? plan.selectedBorderColor : plan.borderColor, lineWidth: 2)
         )
     }
-}
-
-#Preview {
-    IAPPaywallPlanView(plan: .init(
-        id: "", 
-        iconColor: .black,
-        title: .init(title: "Monthly", color: .black, font: .body.bold()),
-        subTitle: .init(title: "Get full access for just $3.99/mo", color: .black, font: .body),
-        promotion: .init(title: "74% OFF", titleColor: .white, font: .caption, backgroundColor: .black),
-        selectedBorderColor: .black
-    ), isSelected: false)
 }

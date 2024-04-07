@@ -1,6 +1,6 @@
 //
-//  File.swift
-//  
+//  PurchaseResult.swift
+//
 //
 //  Created by Lkoberidze on 17.02.24.
 //

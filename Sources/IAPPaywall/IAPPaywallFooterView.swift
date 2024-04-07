@@ -28,7 +28,7 @@ struct IAPPaywallFooterView: View {
             Button(action: {
                 Task {
                     do {
-                        let purchaseResult = try await purchaseManager.purchase(selectedPlan?.id ?? "")
+                        let purchaseResult = try await purchaseManager.purchase(selectedPlan?.id ?? .init())
                         onPurchase?(purchaseResult)
                     } catch {
                         onPurchase?(.unknownError)
@@ -40,7 +40,7 @@ struct IAPPaywallFooterView: View {
                     .foregroundStyle(model.payButton.titleColor)
             })
             .frame(maxWidth: .infinity)
-            .frame(height: 45)
+            .frame(height: 55)
             .background(model.payButton.backgroundColor)
             .clipShape(Capsule())
             .padding(15)

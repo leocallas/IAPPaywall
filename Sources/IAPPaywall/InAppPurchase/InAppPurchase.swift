@@ -11,15 +11,21 @@ import StoreKit
 @MainActor
 final public class InAppPurchase: NSObject, ObservableObject {
 
+    // MARK: - Private Properties
+
     @Published private(set) var products: [Product] = []
     @Published private(set) var purchasedProductIDs = Set<String>()
 
     private var updates: Task<Void, Never>? = nil
     private var productsLoaded = false
 
-    var hasPurchased: Bool {
+    // MARK: - Public Properties
+
+    public var hasPurchased: Bool {
         !self.purchasedProductIDs.isEmpty
     }
+
+    // MARK: - Init
 
     override public init() {
         super.init()
@@ -31,7 +37,9 @@ final public class InAppPurchase: NSObject, ObservableObject {
         updates?.cancel()
     }
     
-    func setSubscriptionProducts(_ subscriptionProducts: [SubscriptionProduct]) {
+    // MARK: - Internal & Private Methods
+
+    internal func setSubscriptionProducts(_ subscriptionProducts: [SubscriptionProduct]) {
         guard !self.productsLoaded else { return }
         Task {
             self.products = try await Product.products(for: subscriptionProducts.map({ $0.productId }))
@@ -39,6 +47,20 @@ final public class InAppPurchase: NSObject, ObservableObject {
         }
     }
 
+    private func observeTransactionUpdates() -> Task<Void, Never> {
+        Task(priority: .background) { [unowned self] in
+            for await _ in Transaction.updates {
+                // Using verificationResult directly would be better
+                await self.updatePurchasedProducts()
+            }
+        }
+    }
+
+    // MARK: - Public Methods
+    
+    /// Initiates a purchase for the product with the App Store and displays the confirmation sheet.
+    /// - Parameter productId: A unique alphanumeric ID that is assigned on each subscription / inapp product on the appstoreconnect
+    /// - Returns: The result state of the purchase
     public func purchase(_ productId: String) async throws -> PurchaseResult {
         let product = products.first(where: { $0.id == productId })
         let result = try await product?.purchase()
@@ -49,7 +71,6 @@ final public class InAppPurchase: NSObject, ObservableObject {
             await self.updatePurchasedProducts()
             return .success(.verified)
         case let .success(.unverified(_, error)):
-            print(error)
             return .success(.unverified(error))
         case .pending:
             return .pending
@@ -76,19 +97,14 @@ final public class InAppPurchase: NSObject, ObservableObject {
         }
     }
     
+    /// Synchronizes your app’s transaction information and subscription status with information from the App Store.
+    /// - Returns: True if found transaction information and restoration is successful
     public func restore() async -> Bool {
         ((try? await AppStore.sync()) != nil)
     }
-
-    private func observeTransactionUpdates() -> Task<Void, Never> {
-        Task(priority: .background) { [unowned self] in
-            for await _ in Transaction.updates {
-                // Using verificationResult directly would be better
-                await self.updatePurchasedProducts()
-            }
-        }
-    }
 }
+
+// MARK: - SKPaymentTransactionObserver
 
 extension InAppPurchase: SKPaymentTransactionObserver {
     public func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) { }

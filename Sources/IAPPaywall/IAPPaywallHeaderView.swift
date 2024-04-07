@@ -24,17 +24,21 @@ struct IAPPaywallHeaderView: View {
                 headerImage
                     .resizable()
                     .aspectRatio(contentMode: .fill)
-                    .frame(width: size.width, height: size.height + (model.header.isStretchy ? (minY > .zero ? minY : .zero) : .zero))
+                    .frame(width: size.width, height: size.height + (model.header.isStretchy ? (minY > .zero ? minY : .zero) : .zero), alignment: .center)
                     .overlay(content: {
-                        Rectangle()
-                            .fill(.ultraThinMaterial)
-                            .opacity(progress)
-                            .overlay(alignment: .bottom) {
-                                Text(model.header.title)
-                                    .font(model.header.font)
-                                    .foregroundStyle(model.header.color)
-                                    .offset(y: 90 - (100 * progress))
-                            }
+                        if model.header.shouldShowBlurNavBarOnScroll {
+                            Rectangle()
+                                .fill(.ultraThinMaterial)
+                                .opacity(progress)
+                                .overlay(alignment: .bottom) {
+                                    if let title = model.header.title {
+                                        Text(title)
+                                            .font(model.header.font)
+                                            .foregroundStyle(model.header.color ?? .clear)
+                                            .offset(y: 90 - (100 * progress))
+                                    }
+                                }
+                        }
                     })
                     .clipped()
                     .offset(y: model.header.isSticky ? (minY > .zero ? -minY : limitedMinY) : .zero)
