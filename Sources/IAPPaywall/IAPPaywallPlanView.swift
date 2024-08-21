@@ -59,5 +59,6 @@ struct IAPPaywallPlanView: View {
             RoundedRectangle(cornerRadius: 15)
                 .stroke(isSelected ? plan.selectedBorderColor : plan.borderColor, lineWidth: 2)
         )
+        .contentShape(Rectangle())
     }
 }
