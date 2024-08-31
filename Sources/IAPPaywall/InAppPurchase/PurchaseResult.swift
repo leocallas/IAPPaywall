@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import StoreKit
 
 public enum PurchaseResult {
     case success(VerificationResult)
@@ -14,7 +15,7 @@ public enum PurchaseResult {
     case unknownError
     
     public enum VerificationResult {
-        case verified
-        case unverified(Error?)
+        case verified(Transaction)
+        case unverified(Transaction, Error?)
     }
 }
