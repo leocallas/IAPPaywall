@@ -9,13 +9,8 @@ import Foundation
 import StoreKit
 
 public enum PurchaseResult {
-    case success(VerificationResult)
+    case success(Product.PurchaseResult?)
     case pending
     case userCancelled
     case unknownError
-    
-    public enum VerificationResult {
-        case verified(Transaction)
-        case unverified(Transaction, Error?)
-    }
 }
