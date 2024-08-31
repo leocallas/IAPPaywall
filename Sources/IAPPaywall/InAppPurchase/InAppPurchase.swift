@@ -69,9 +69,9 @@ final public class InAppPurchase: NSObject, ObservableObject {
         case let .success(.verified(transaction)):
             await transaction.finish()
             await self.updatePurchasedProducts()
-            return .success(result)
-        case .success(.unverified):
-            return .success(result)
+            return .success(.verified)
+        case let .success(.unverified(_, error)):
+            return .success(.unverified(error))
         case .pending:
             return .pending
         case .userCancelled:
