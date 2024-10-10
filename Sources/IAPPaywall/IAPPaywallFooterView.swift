@@ -14,7 +14,7 @@ struct IAPPaywallFooterView: View {
     @StateObject var purchaseManager = InAppPurchase()
     @Binding var hasPurchased: Bool
 
-    var onPurchase: ((PurchaseResult) -> Void)?
+    var onPurchase: ((PurchaseResult, IAPPaywallModel.Plan?) -> Void)?
     var onRestore: ((Bool) -> Void)?
 
     var body: some View {
@@ -29,9 +29,9 @@ struct IAPPaywallFooterView: View {
                 Task {
                     do {
                         let purchaseResult = try await purchaseManager.purchase(selectedPlan?.id ?? .init())
-                        onPurchase?(purchaseResult)
+                        onPurchase?(purchaseResult, selectedPlan)
                     } catch {
-                        onPurchase?(.unknownError)
+                        onPurchase?(.unknownError, nil)
                     }
                 }
             }, label: {

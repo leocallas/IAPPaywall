@@ -9,7 +9,7 @@ public struct IAPPaywallView: View {
     @State var selectedPlan: IAPPaywallModel.Plan?
     @State var hasPurchased: Bool = false
 
-    private(set) var onPurchase: ((PurchaseResult) -> Void)?
+    private(set) var onPurchase: ((PurchaseResult, IAPPaywallModel.Plan?) -> Void)?
     private(set) var onRestore: ((Bool) -> Void)?
 
     public init(model: IAPPaywallModel) {
@@ -39,7 +39,7 @@ public struct IAPPaywallView: View {
 }
 
 extension IAPPaywallView {
-    public func onPurchase(perform action: @escaping (PurchaseResult) -> Void) -> Self {
+    public func onPurchase(perform action: @escaping (PurchaseResult, IAPPaywallModel.Plan?) -> Void) -> Self {
         var copy = self
         copy.onPurchase = action
         return copy
