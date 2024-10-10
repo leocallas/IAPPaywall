@@ -189,7 +189,7 @@ public struct IAPPaywallModel {
     public struct Plan: Identifiable, Hashable {
         public var id: String
         var iconColor: Color = .black
-        var title: Title
+        public var title: Title
         var subTitle: SubTitle
         var promotion: Promo?
         var borderColor: Color = .black
