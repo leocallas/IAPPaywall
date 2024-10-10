@@ -189,7 +189,8 @@ public struct IAPPaywallModel {
     public struct Plan: Identifiable, Hashable {
         public var id: String
         var iconColor: Color = .black
-        public var title: Title
+        var title: Title
+        public var price: Double
         var subTitle: SubTitle
         var promotion: Promo?
         var borderColor: Color = .black
@@ -200,6 +201,7 @@ public struct IAPPaywallModel {
             iconColor: Color = .black,
             title: Title,
             subTitle: SubTitle,
+            price: Double,
             promotion: Promo? = nil,
             borderColor: Color = .black,
             selectedBorderColor: Color = .black
@@ -208,6 +210,7 @@ public struct IAPPaywallModel {
             self.iconColor = iconColor
             self.title = title
             self.subTitle = subTitle
+            self.price = price
             self.promotion = promotion
             self.borderColor = borderColor
             self.selectedBorderColor = selectedBorderColor
