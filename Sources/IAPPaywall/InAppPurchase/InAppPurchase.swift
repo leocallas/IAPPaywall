@@ -13,7 +13,10 @@ final public class InAppPurchase: NSObject, ObservableObject {
 
     // MARK: - Private Properties
 
+    /// Fetched subscription products from the App Store
     @Published private(set) var products: [Product] = []
+
+    /// Set of product identifiers the user has purchased and are currently valid
     @Published private(set) var purchasedProductIDs = Set<String>()
 
     private var updates: Task<Void, Never>? = nil
@@ -21,6 +24,9 @@ final public class InAppPurchase: NSObject, ObservableObject {
 
     // MARK: - Public Properties
 
+    public static var shared: InAppPurchase = InAppPurchase()
+
+    /// Returns true if the user has any active purchased product
     public var hasPurchased: Bool {
         !self.purchasedProductIDs.isEmpty
     }
@@ -39,6 +45,8 @@ final public class InAppPurchase: NSObject, ObservableObject {
     
     // MARK: - Internal & Private Methods
 
+    /// Loads product metadata for the provided subscription product definitions
+    /// - Parameter subscriptionProducts: List of local product models with App Store product identifiers
     internal func setSubscriptionProducts(_ subscriptionProducts: [SubscriptionProduct]) {
         guard !self.productsLoaded else { return }
         Task {
@@ -47,17 +55,25 @@ final public class InAppPurchase: NSObject, ObservableObject {
         }
     }
 
+    /// Observes transaction updates from the App Store and updates local purchase state
     private func observeTransactionUpdates() -> Task<Void, Never> {
         Task(priority: .background) { [unowned self] in
             for await _ in Transaction.updates {
-                // Using verificationResult directly would be better
+                // Updates local entitlement state for current user
+                // NOTE: Using verificationResult directly would be better
                 await self.updatePurchasedProducts()
             }
         }
     }
 
-    // MARK: - Public Methods
+    // MARK: - Public API
     
+    public static func configure() {
+        Task {
+            await shared.updatePurchasedProducts()
+        }
+    }
+
     /// Initiates a purchase for the product with the App Store and displays the confirmation sheet.
     /// - Parameter productId: A unique alphanumeric ID that is assigned on each subscription / inapp product on the appstoreconnect
     /// - Returns: The result state of the purchase
@@ -83,6 +99,7 @@ final public class InAppPurchase: NSObject, ObservableObject {
         }
     }
 
+    /// Updates the set of currently active purchased product identifiers by verifying entitlements
     public func updatePurchasedProducts() async {
         for await result in Transaction.currentEntitlements {
             guard case .verified(let transaction) = result else {
@@ -102,11 +119,19 @@ final public class InAppPurchase: NSObject, ObservableObject {
     public func restore() async -> Bool {
         ((try? await AppStore.sync()) != nil)
     }
+    
+    /// Returns the `Product` from StoreKit for a given product identifier, if it exists
+    public func product(for productId: String) -> Product? {
+        return products.first(where: { $0.id == productId })
+    }
 }
 
 // MARK: - SKPaymentTransactionObserver
 
-extension InAppPurchase: SKPaymentTransactionObserver {
+extension InAppPurchase: @preconcurrency SKPaymentTransactionObserver {
+    /// Required by StoreKit to handle legacy transactions, not used here
     public func paymentQueue(_ queue: SKPaymentQueue, updatedTransactions transactions: [SKPaymentTransaction]) { }
+    
+    /// Allows promotional purchases from the App Store (outside the app) to auto-present the purchase UI
     public func paymentQueue(_ queue: SKPaymentQueue, shouldAddStorePayment payment: SKPayment, for product: SKProduct) -> Bool { true }
 }

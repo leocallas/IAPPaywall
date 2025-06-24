@@ -7,17 +7,13 @@ let package = Package(
     name: "IAPPaywall",
     platforms: [.iOS(.v16)],
     products: [
-        // Products define the executables and libraries a package produces, making them visible to other packages.
         .library(
             name: "IAPPaywall",
             targets: ["IAPPaywall"]),
     ],
     targets: [
-        // Targets are the basic building blocks of a package, defining a module or a test suite.
-        // Targets can depend on other targets in this package and products from dependencies.
         .target(
-            name: "IAPPaywall",
-            resources: [.copy("Assets.xcassets")]
+            name: "IAPPaywall"
         ),
         .testTarget(
             name: "IAPPaywallTests",

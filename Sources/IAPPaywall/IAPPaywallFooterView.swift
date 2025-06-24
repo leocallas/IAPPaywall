@@ -11,7 +11,7 @@ struct IAPPaywallFooterView: View {
     
     @Binding var model: IAPPaywallModel
     @Binding var selectedPlan: IAPPaywallModel.Plan?
-    @StateObject var purchaseManager = InAppPurchase()
+    @StateObject var purchaseManager: InAppPurchase
     @Binding var hasPurchased: Bool
 
     var onPurchase: ((PurchaseResult, IAPPaywallModel.Plan?) -> Void)?
@@ -20,9 +20,20 @@ struct IAPPaywallFooterView: View {
     var body: some View {
         VStack(spacing: .zero) {
             if let caption = model.payButton.caption {
-                Text(caption.title)
+                HStack(spacing: 12) {
+                    caption.icon?
+                        .resizable()
+                        .frame(width: 18, height: 18)
+                        .foregroundStyle(caption.iconTint ?? .white)
+                        
+                    Text(
+                        model.trial?.payButtonCaptionOverride != nil && model.trial?.isEnabled == true
+                        ? model.trial?.payButtonCaptionOverride ?? caption.title
+                        : caption.title
+                    )
                     .font(caption.font)
                     .foregroundStyle(caption.color)
+                }
             }
             
             Button(action: {
@@ -35,9 +46,13 @@ struct IAPPaywallFooterView: View {
                     }
                 }
             }, label: {
-                Text(model.payButton.title)
-                    .font(model.payButton.font)
-                    .foregroundStyle(model.payButton.titleColor)
+                Text(
+                    model.trial != nil && model.trial?.isEnabled == true
+                    ? (model.trial?.payButtonTitleOverride ?? model.payButton.title)
+                    : model.payButton.title
+                )
+                .font(model.payButton.font)
+                .foregroundStyle(model.payButton.titleColor)
             })
             .frame(maxWidth: .infinity)
             .frame(height: 55)
@@ -62,10 +77,21 @@ struct IAPPaywallFooterView: View {
                 }
             }
         }
-        .onAppear(perform: {
-            purchaseManager.setSubscriptionProducts(model.plans.map({ SubscriptionProduct(title: $0.title.title, description: $0.subTitle.title, productId: $0.id) }))
+        .onAppear(
+            perform: {
+                purchaseManager.setSubscriptionProducts(
+                    model.plans.map(
+                        {
+                            SubscriptionProduct(
+                                title: $0.title.title,
+                                description: $0.subTitle?.title,
+                                productId: $0.id
+                            )
+                        })
+                )
             addRestoreButton()
         })
+        .zIndex(100)
     }
 
     private func addRestoreButton() {

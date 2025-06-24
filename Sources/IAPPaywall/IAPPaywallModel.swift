@@ -8,90 +8,30 @@
 import SwiftUI
 
 public struct IAPPaywallModel {
-    var title: Title
-    var subTitle: SubTitle?
-    var header: Header
-    var points: [Point]?
+    var isStretchy = true
+    var isSticky = true
     var payButton: PayButton
     var footerLinks: [FooterLink] = []
     var plans: [Plan]
-    
+    var bullets: (titles: [String], font: Font, color: Color)
+    var trial: Trial?
+
     public init(
-        title: Title,
-        subTitle: SubTitle? = nil,
-        header: Header,
-        points: [Point]? = nil,
+        isStretchy: Bool = false,
+        isSticky: Bool = true,
         payButton: PayButton,
         footerLinks: [FooterLink], 
-        plans: [Plan]
+        plans: [Plan],
+        bullets: ([String], font: Font, color: Color) = ([], .body, .black),
+        trial: Trial? = nil
     ) {
-        self.title = title
-        self.subTitle = subTitle
-        self.header = header
-        self.points = points
+        self.isStretchy = isStretchy
+        self.isSticky = isSticky
         self.payButton = payButton
         self.footerLinks = footerLinks
         self.plans = plans
-    }
-
-    public struct Title {
-        var title: String
-        var font: Font = .largeTitle.bold()
-        var color: Color = .black
-
-        public init(
-            title: String,
-            font: Font = .largeTitle.bold(),
-            color: Color = .black
-        ) {
-            self.title = title
-            self.font = font
-            self.color = color
-        }
-    }
-
-    public struct SubTitle {
-        var subTitle: String
-        var font: Font = .body
-        var color: Color = .black
-        
-        public init(
-            subTitle: String,
-            font: Font = .body,
-            color: Color = .black
-        ) {
-            self.subTitle = subTitle
-            self.font = font
-            self.color = color
-        }
-    }
-
-    public struct Header {
-        var title: String?
-        var font: Font? = .body
-        var color: Color? = .black
-        var image: Image?
-        var isSticky: Bool = true
-        var isStretchy: Bool = true
-        var shouldShowBlurNavBarOnScroll: Bool = true
-
-        public init(
-            title: String? = nil,
-            font: Font? = .body,
-            color: Color? = .black,
-            image: Image? = nil,
-            isSticky: Bool = true,
-            isStretchy: Bool = true,
-            shouldShowBlurNavBarOnScroll: Bool = true
-        ) {
-            self.title = title
-            self.font = font
-            self.color = color
-            self.image = image
-            self.isSticky = isSticky
-            self.isStretchy = isStretchy
-            self.shouldShowBlurNavBarOnScroll = shouldShowBlurNavBarOnScroll
-        }
+        self.bullets = bullets
+        self.trial = trial
     }
 
     public struct PayButton {
@@ -119,36 +59,22 @@ public struct IAPPaywallModel {
             var title: String
             var font: Font = .caption
             var color: Color = .gray
+            var icon: Image?
+            var iconTint: Color?
             
             public init(
                 title: String,
                 font: Font = .caption,
-                color: Color = .gray
+                color: Color = .gray,
+                icon: Image? = nil,
+                iconTint: Color? = nil
             ) {
                 self.title = title
                 self.font = font
                 self.color = color
+                self.icon = icon
+                self.iconTint = iconTint
             }
-        }
-    }
-
-    public struct Point: Identifiable {
-        public var id: UUID = UUID()
-        var icon: Image
-        var title: String
-        var font: Font = .body
-        var color: Color = .black
-        
-        public init(
-            icon: Image,
-            title: String,
-            font: Font = .body,
-            color: Color = .black
-        ) {
-            self.icon = icon
-            self.title = title
-            self.font = font
-            self.color = color
         }
     }
 
@@ -188,29 +114,32 @@ public struct IAPPaywallModel {
 
     public struct Plan: Identifiable, Hashable {
         public var id: String
-        var iconColor: Color = .black
+        var type: PlanType
+        var checkmarkIconColor: Color = .black
         var title: Title
-        public var price: Double
-        var subTitle: SubTitle
+        var subTitle: SubTitle?
+        var rightTitle: Title?
         var promotion: Promo?
         var borderColor: Color = .black
         var selectedBorderColor: Color = .black
         
         public init(
             id: String,
-            iconColor: Color = .black,
+            type: PlanType,
+            checkmarkIconColor: Color = .black,
             title: Title,
-            subTitle: SubTitle,
-            price: Double,
+            subTitle: SubTitle? = nil,
+            rightTitle: Title? = nil,
             promotion: Promo? = nil,
             borderColor: Color = .black,
             selectedBorderColor: Color = .black
         ) {
             self.id = id
-            self.iconColor = iconColor
+            self.type = type
+            self.checkmarkIconColor = checkmarkIconColor
             self.title = title
             self.subTitle = subTitle
-            self.price = price
+            self.rightTitle = rightTitle
             self.promotion = promotion
             self.borderColor = borderColor
             self.selectedBorderColor = selectedBorderColor
@@ -266,7 +195,7 @@ public struct IAPPaywallModel {
                 self.backgroundColor = backgroundColor
             }
         }
-
+        
         public func hash(into hasher: inout Hasher) {
             return hasher.combine(id)
         }
@@ -274,5 +203,70 @@ public struct IAPPaywallModel {
         static public func == (lhs: IAPPaywallModel.Plan, rhs: IAPPaywallModel.Plan) -> Bool {
             lhs.id == rhs.id
         }
+    }
+    
+    public struct Trial {
+        public var isEnabled: Bool
+        public var overridePlan: OverridePlan?
+        public var shouldSelectOverridePlan = true
+        public var payButtonTitleOverride: String?
+        public var payButtonCaptionOverride: String?
+        public var onTitle: String
+        public var offTitle: String?
+        public var titleColor: Color
+        public var titleFont: Font
+        public var toggleTintColor: Color
+        public var borderColor: Color
+
+        public init(
+            isEnabled: Bool,
+            overridePlan: OverridePlan? = nil,
+            shouldSelectOverridePlan: Bool = true,
+            payButtonTitleOverride: String? = nil,
+            payButtonCaptionOverride: String? = nil,
+            onTitle: String,
+            offTitle: String? = nil,
+            titleColor: Color = .black,
+            titleFont: Font = .title3,
+            toggleTintColor: Color = .accentColor,
+            borderColor: Color = .black
+        ) {
+            self.isEnabled = isEnabled
+            self.overridePlan = overridePlan
+            self.shouldSelectOverridePlan = shouldSelectOverridePlan
+            self.payButtonTitleOverride = payButtonTitleOverride
+            self.payButtonCaptionOverride = payButtonCaptionOverride
+            self.onTitle = onTitle
+            self.offTitle = offTitle
+            self.titleColor = titleColor
+            self.titleFont = titleFont
+            self.toggleTintColor = toggleTintColor
+            self.borderColor = borderColor
+        }
+        
+        public struct OverridePlan {
+            var title: String?
+            var subtitle: String?
+            var rightTitle: String?
+            var planToOverride: PlanType
+            
+            public init(
+                planToOverride: PlanType,
+                title: String? = nil,
+                subtitle: String? = nil,
+                rightTitle: String? = nil
+            ) {
+                self.planToOverride = planToOverride
+                self.title = title
+                self.subtitle = subtitle
+                self.rightTitle = rightTitle
+            }
+        }
+    }
+
+    public enum PlanType {
+        case weekly
+        case monthly
+        case yearly
     }
 }

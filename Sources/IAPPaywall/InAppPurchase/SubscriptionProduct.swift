@@ -9,6 +9,6 @@ import Foundation
 
 struct SubscriptionProduct {
     var title: String
-    var description: String
+    var description: String?
     var productId: String
 }
