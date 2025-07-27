@@ -91,7 +91,7 @@ struct IAPPaywallPlanView: View {
     }
     
     private func resolvedText(_ template: String, id: String) -> String {
-        guard let product = purchaseManager.product(for: id) else {
+        guard let product = purchaseManager.cachedProduct(for: id) else {
             return template
                 .replacingOccurrences(of: "{price}", with: "…")
                 .replacingOccurrences(of: "{year_weekly_price}", with: "...")
@@ -100,7 +100,7 @@ struct IAPPaywallPlanView: View {
         return template
             .replacingOccurrences(of: "{price}", with: product.localizedPrice)
             .replacingOccurrences(of: "{year_weekly_price}", with: "\(product.formattedYearWeeklyPrice ?? "...")")
-            .replacingOccurrences(of: "{trial_duration}", with: "\(purchaseManager.product(for: id)?.trialDuration ?? .zero)")
+            .replacingOccurrences(of: "{trial_duration}", with: "\(purchaseManager.cachedProduct(for: id)?.trialDuration ?? .zero)")
     }
 }
 

@@ -98,12 +98,9 @@ struct IAPPaywallContentView: View {
                 .init(
                     isStretchy: false,
                     isSticky: false,
-                    payButton: .init(
-                        title: "pay",
-                        titleColor: .accentColor,
-                        font: .body,
-                        backgroundColor: .white
-                    ),
+                    payButton: .init(label: {
+                        
+                    }),
                     footerLinks: [],
                     plans: [
                         .init(

@@ -7,20 +7,11 @@
 
 import Foundation
 import StoreKit
+import SwiftUI
+import Combine
 
 @MainActor
 final public class InAppPurchase: NSObject, ObservableObject {
-
-    // MARK: - Private Properties
-
-    /// Fetched subscription products from the App Store
-    @Published private(set) var products: [Product] = []
-
-    /// Set of product identifiers the user has purchased and are currently valid
-    @Published private(set) var purchasedProductIDs = Set<String>()
-
-    private var updates: Task<Void, Never>? = nil
-    private var productsLoaded = false
 
     // MARK: - Public Properties
 
@@ -31,41 +22,39 @@ final public class InAppPurchase: NSObject, ObservableObject {
         !self.purchasedProductIDs.isEmpty
     }
 
+    // MARK: - Private Properties
+
+    /// Fetched subscription products from the App Store
+    @Published private(set) var products: [Product] = []
+
+    /// Set of product identifiers the user has purchased and are currently valid
+    @Published private(set) var purchasedProductIDs = Set<String>()
+
+    @Published private var cachedProductDisplay: [CachedProduct] = []
+
+    private var updates: Task<Void, Never>? = nil
+    private var productsLoaded = false
+    private let productCacheKey = "cachedProducts"
+    private let purchasedIDsKey = "purchasedProductIDs"
+
     // MARK: - Init
 
     override public init() {
         super.init()
+        self.loadCachedProducts()
+        self.loadCachedPurchasedProductIDs()
         self.updates = observeTransactionUpdates()
         SKPaymentQueue.default().add(self)
+
+        Task {
+            await tryFetchingStoreData()
+        }
     }
 
     deinit {
         updates?.cancel()
     }
     
-    // MARK: - Internal & Private Methods
-
-    /// Loads product metadata for the provided subscription product definitions
-    /// - Parameter subscriptionProducts: List of local product models with App Store product identifiers
-    internal func setSubscriptionProducts(_ subscriptionProducts: [SubscriptionProduct]) {
-        guard !self.productsLoaded else { return }
-        Task {
-            self.products = try await Product.products(for: subscriptionProducts.map({ $0.productId }))
-            self.productsLoaded = true
-        }
-    }
-
-    /// Observes transaction updates from the App Store and updates local purchase state
-    private func observeTransactionUpdates() -> Task<Void, Never> {
-        Task(priority: .background) { [unowned self] in
-            for await _ in Transaction.updates {
-                // Updates local entitlement state for current user
-                // NOTE: Using verificationResult directly would be better
-                await self.updatePurchasedProducts()
-            }
-        }
-    }
-
     // MARK: - Public API
     
     public static func configure() {
@@ -84,6 +73,8 @@ final public class InAppPurchase: NSObject, ObservableObject {
         switch result {
         case let .success(.verified(transaction)):
             await transaction.finish()
+            purchasedProductIDs.insert(transaction.productID)
+            cachePurchasedProductIDs(purchasedProductIDs)
             await self.updatePurchasedProducts()
             return .success(.verified, result)
         case let .success(.unverified(_, error)):
@@ -101,17 +92,17 @@ final public class InAppPurchase: NSObject, ObservableObject {
 
     /// Updates the set of currently active purchased product identifiers by verifying entitlements
     public func updatePurchasedProducts() async {
+        var updatedSet = Set<String>()
+
         for await result in Transaction.currentEntitlements {
-            guard case .verified(let transaction) = result else {
-                continue
-            }
-            
-            if transaction.revocationDate == nil {
-                self.purchasedProductIDs.insert(transaction.productID)
-            } else {
-                self.purchasedProductIDs.remove(transaction.productID)
+            if case let .verified(transaction) = result,
+               transaction.revocationDate == nil {
+                updatedSet.insert(transaction.productID)
             }
         }
+
+        self.purchasedProductIDs = updatedSet
+        self.cachePurchasedProductIDs(updatedSet)
     }
     
     /// Synchronizes your app’s transaction information and subscription status with information from the App Store.
@@ -122,7 +113,100 @@ final public class InAppPurchase: NSObject, ObservableObject {
     
     /// Returns the `Product` from StoreKit for a given product identifier, if it exists
     public func product(for productId: String) -> Product? {
-        return products.first(where: { $0.id == productId })
+        products.first(where: { $0.id == productId })
+    }
+    
+    /// Returns the `CachedProduct` from for a given product identifier, if it exists
+    public func cachedProduct(for productId: String) -> CachedProduct? {
+        cachedProductDisplay.first(where: { $0.id == productId }) ?? products.first(where: { $0.id == productId }).map {
+            CachedProduct(
+                id: $0.id,
+                localizedPrice: $0.localizedPrice,
+                formattedYearWeeklyPrice: $0.formattedYearWeeklyPrice,
+                trialDuration: $0.trialDuration
+            )
+        }
+    }
+
+    // MARK: - Internal & Private Methods
+
+    /// Loads product metadata for the provided subscription product definitions
+    /// - Parameter subscriptionProducts: List of local product models with App Store product identifiers
+    internal func setSubscriptionProducts(_ subscriptionProducts: [SubscriptionProduct]) {
+        guard !self.productsLoaded else { return }
+        Task {
+            do {
+                let fetched = try await Product.products(for: subscriptionProducts.map(\.productId))
+                self.products = fetched
+                self.productsLoaded = true
+                self.cacheProducts(fetched)
+            } catch {
+                // Failed to load from network, fallback already handled in init
+            }
+        }
+    }
+
+    /// Observes transaction updates from the App Store and updates local purchase state
+    private func observeTransactionUpdates() -> Task<Void, Never> {
+        Task(priority: .background) { [unowned self] in
+            for await _ in Transaction.updates {
+                // Updates local entitlement state for current user
+                // NOTE: Using verificationResult directly would be better
+                await self.updatePurchasedProducts()
+            }
+        }
+    }
+    
+    private func tryFetchingStoreData() async {
+        await updatePurchasedProducts()
+        await reloadStoreProducts()
+    }
+    
+    // MARK: - Product Caching
+    
+    private func cachePurchasedProductIDs(_ ids: Set<String>) {
+        UserDefaults.standard.set(Array(ids), forKey: purchasedIDsKey)
+    }
+
+    private func loadCachedPurchasedProductIDs() {
+        let ids = UserDefaults.standard.stringArray(forKey: purchasedIDsKey) ?? []
+        purchasedProductIDs = Set(ids)
+    }
+    
+    private func cacheProducts(_ products: [Product]) {
+        let cached: [CachedProduct] = products.map {
+            CachedProduct(
+                id: $0.id,
+                localizedPrice: $0.localizedPrice,
+                formattedYearWeeklyPrice: $0.formattedYearWeeklyPrice,
+                trialDuration: $0.trialDuration
+            )
+        }
+        
+        if let data = try? JSONEncoder().encode(cached) {
+            UserDefaults.standard.set(data, forKey: productCacheKey)
+        }
+    }
+    
+    private func loadCachedProducts() {
+        guard
+            let data = UserDefaults.standard.data(forKey: productCacheKey),
+            let cached = try? JSONDecoder().decode([CachedProduct].self, from: data) else {
+            return
+        }
+        cachedProductDisplay = cached
+    }
+    
+    // MARK: - Network Check
+
+    private func reloadStoreProducts() async {
+        guard productsLoaded else { return }
+        do {
+            let updated = try await Product.products(for: products.map(\.id))
+            self.products = updated
+            cacheProducts(updated)
+        } catch {
+        }
     }
 }
 

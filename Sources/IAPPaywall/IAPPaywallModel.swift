@@ -35,23 +35,15 @@ public struct IAPPaywallModel {
     }
 
     public struct PayButton {
-        var title: String
-        var titleColor: Color = .white
-        var font: Font = .body
-        var backgroundColor: Color = .black
-        var caption: Caption?
-        
-        public init(
-            title: String,
-            titleColor: Color,
-            font: Font, 
-            backgroundColor: Color,
+        /// Do not pass a Button as the pay button label — the action is already handled by the paywall.
+        public let labelBuilder: () -> AnyView
+        public let caption: Caption?
+
+        public init<Content: View>(
+            @ViewBuilder label: @escaping () -> Content,
             caption: Caption? = nil
         ) {
-            self.title = title
-            self.titleColor = titleColor
-            self.font = font
-            self.backgroundColor = backgroundColor
+            self.labelBuilder = { AnyView(label()) }
             self.caption = caption
         }
         
@@ -75,6 +67,17 @@ public struct IAPPaywallModel {
                 self.icon = icon
                 self.iconTint = iconTint
             }
+        }
+        
+        public func makeWrappedButton(
+            action: @escaping () -> Void
+        ) -> some View {
+            Button(action: action) {
+                labelBuilder()
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 55)
+            .padding(.horizontal, 15)
         }
     }
 

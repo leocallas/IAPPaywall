@@ -18,7 +18,7 @@ struct IAPPaywallFooterView: View {
     var onRestore: ((Bool) -> Void)?
 
     var body: some View {
-        VStack(spacing: .zero) {
+        VStack(spacing: 16) {
             if let caption = model.payButton.caption {
                 HStack(spacing: 12) {
                     caption.icon?
@@ -36,29 +36,16 @@ struct IAPPaywallFooterView: View {
                 }
             }
             
-            Button(action: {
+            model.payButton.makeWrappedButton {
                 Task {
                     do {
-                        let purchaseResult = try await purchaseManager.purchase(selectedPlan?.id ?? .init())
-                        onPurchase?(purchaseResult, selectedPlan)
+                        let result = try await purchaseManager.purchase(selectedPlan?.id ?? "")
+                        onPurchase?(result, selectedPlan)
                     } catch {
                         onPurchase?(.unknownError, nil)
                     }
                 }
-            }, label: {
-                Text(
-                    model.trial != nil && model.trial?.isEnabled == true
-                    ? (model.trial?.payButtonTitleOverride ?? model.payButton.title)
-                    : model.payButton.title
-                )
-                .font(model.payButton.font)
-                .foregroundStyle(model.payButton.titleColor)
-            })
-            .frame(maxWidth: .infinity)
-            .frame(height: 55)
-            .background(model.payButton.backgroundColor)
-            .clipShape(Capsule())
-            .padding(15)
+            }
             
             HStack {
                 ForEach(Array(model.footerLinks.enumerated()), id: \.element) { index, link in
@@ -84,7 +71,7 @@ struct IAPPaywallFooterView: View {
                         {
                             SubscriptionProduct(
                                 title: $0.title.title,
-                                description: $0.subTitle?.title,
+                                description: nil,
                                 productId: $0.id
                             )
                         })
