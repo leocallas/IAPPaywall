@@ -81,6 +81,16 @@ public struct IAPPaywallModel {
         public var content: AnyView?
         public var restoreButtonColor: Color = .gray
         public var restoreButtonFont: Font = .caption
+        
+        public init(
+            content: AnyView? = nil,
+            restoreButtonColor: Color,
+            restoreButtonFont: Font
+        ) {
+            self.content = content
+            self.restoreButtonColor = restoreButtonColor
+            self.restoreButtonFont = restoreButtonFont
+        }
     }
 
     public struct Trial {
