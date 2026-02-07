@@ -44,9 +44,9 @@ public struct IAPPaywallModel {
 
     public struct Plan: Identifiable, Hashable {
         public var id: String
-        var type: PlanType
-        var content: ((_ data: PlanData) -> AnyView)?
-        var promo: ((_ data: PlanData) -> AnyView)?
+        public var type: PlanType
+        public var content: ((_ data: PlanData) -> AnyView)?
+        public var promo: ((_ data: PlanData) -> AnyView)?
 
         public init(
             id: String,
@@ -61,15 +61,15 @@ public struct IAPPaywallModel {
         }
 
         public struct PlanData {
-            var price: String
-            var yearWeeklyPrice: String
-            var trialDuration: Int
-            var isFreeTrialEnabled: Bool
-            var isSelected: Bool
+            public var price: String
+            public var yearWeeklyPrice: String
+            public var trialDuration: Int
+            public var isFreeTrialEnabled: Bool
+            public var isSelected: Bool
         }
 
         public func hash(into hasher: inout Hasher) {
-            return hasher.combine(id)
+            hasher.combine(id)
         }
 
         static public func == (lhs: IAPPaywallModel.Plan, rhs: IAPPaywallModel.Plan) -> Bool {
