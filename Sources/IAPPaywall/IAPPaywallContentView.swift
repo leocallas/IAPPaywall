@@ -47,15 +47,15 @@ struct IAPPaywallContentView: View {
                         HStack {
                             Toggle(isOn: Binding(
                                 get: {
-                                    if selectedPlan?.type != model.trial?.overridePlan?.planToOverride {
+                                    if selectedPlan?.type != model.trial?.selectPlanOnToggle {
                                         return false
                                     }
                                     return trial.isEnabled
                                 },
                                 set: { isOn in
                                     model.trial?.isEnabled = isOn
-                                    if trial.shouldSelectOverridePlan {
-                                        selectedPlan = model.plans.first(where: { $0.type == trial.overridePlan?.planToOverride })
+                                    if let plan = trial.selectPlanOnToggle {
+                                        selectedPlan = model.plans.first(where: { $0.type == plan })
                                     }
                                 }
                             )) {
@@ -71,10 +71,7 @@ struct IAPPaywallContentView: View {
                         .padding(.vertical, 16)
                         .padding(.horizontal, 20)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(trial.borderColor, lineWidth: 2)
-                        )
+                        .background(trial.background)
                         .contentShape(Rectangle())
                         .padding(.vertical, 12)
                     }
@@ -96,24 +93,30 @@ struct IAPPaywallContentView: View {
         model: .init(
             get: {
                 .init(
-                    isStretchy: false,
-                    isSticky: false,
-                    payButton: .init(label: {
-                        
+                    payButton: .init(content: { _ in
+                        AnyView(
+                            Text("")
+                        )
                     }),
-                    footerLinks: [],
+                    footer: .init(),
                     plans: [
                         .init(
                             id: "12",
                             type: .yearly,
-                            title: .init(title: "title"),
-                            subTitle: .init(title: "subtitle")
+                            content: { model in
+                                AnyView(
+                                    Text("Yearly Access")
+                                )
+                            }
                         ),
                         .init(
                             id: "15",
                             type: .monthly,
-                            title: .init(title: "title"),
-                            subTitle: .init(title: "subtitle")
+                            content: { model in
+                                AnyView(
+                                    Text("Weekly Access")
+                                )
+                            }
                         )
                     ],
                     bullets: ([
@@ -134,8 +137,11 @@ struct IAPPaywallContentView: View {
                 .init(
                     id: "12",
                     type: .yearly,
-                    title: .init(title: "title"),
-                    subTitle: .init(title: "subtitle")
+                    content: { _ in
+                        AnyView(
+                            Text("title")
+                        )
+                    }
                 )
             },
             set: { _ in

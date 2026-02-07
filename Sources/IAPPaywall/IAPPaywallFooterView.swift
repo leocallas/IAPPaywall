@@ -20,23 +20,10 @@ struct IAPPaywallFooterView: View {
     var body: some View {
         VStack(spacing: 16) {
             if let caption = model.payButton.caption {
-                HStack(spacing: 12) {
-                    caption.icon?
-                        .resizable()
-                        .frame(width: 18, height: 18)
-                        .foregroundStyle(caption.iconTint ?? .white)
-                        
-                    Text(
-                        model.trial?.payButtonCaptionOverride != nil && model.trial?.isEnabled == true
-                        ? model.trial?.payButtonCaptionOverride ?? caption.title
-                        : caption.title
-                    )
-                    .font(caption.font)
-                    .foregroundStyle(caption.color)
-                }
+                caption(model.trial?.isEnabled == true)
             }
             
-            model.payButton.makeWrappedButton {
+            Button(action: {
                 Task {
                     do {
                         let result = try await purchaseManager.purchase(selectedPlan?.id ?? "")
@@ -45,58 +32,46 @@ struct IAPPaywallFooterView: View {
                         onPurchase?(.unknownError, nil)
                     }
                 }
-            }
+            }, label: {
+                model.payButton.content(model.trial?.isEnabled == true)
+            })
             
-            HStack {
-                ForEach(Array(model.footerLinks.enumerated()), id: \.element) { index, link in
-                    Button(action: {
-                        link.action()
-                    }, label: {
-                        Text(link.title)
-                            .foregroundStyle(link.titleColor)
-                            .font(link.titleFont)
-                    })
+            if let footer = model.footer {
+                HStack {
+                    footer.content
                     
-                    if index < (model.footerLinks.count - 1) {
-                        Text(link.separatorSymbol)
-                            .foregroundStyle(link.separatorSymbolColor)
-                    }
+                    Button(
+                        action: {
+                            Task {
+                                let successfullyRestored = await purchaseManager.restore()
+                                if successfullyRestored {
+                                    await purchaseManager.updatePurchasedProducts()
+                                }
+                                onRestore?(successfullyRestored)
+                            }
+                        },
+                        label: {
+                            Text("Restore")
+                                .foregroundStyle(footer.restoreButtonColor)
+                                .font(footer.restoreButtonFont)
+                        }
+                    )
                 }
             }
         }
-        .onAppear(
-            perform: {
-                purchaseManager.setSubscriptionProducts(
-                    model.plans.map(
-                        {
-                            SubscriptionProduct(
-                                title: $0.title.title,
-                                description: nil,
-                                productId: $0.id
-                            )
-                        })
-                )
-            addRestoreButton()
-        })
-        .zIndex(100)
-    }
-
-    private func addRestoreButton() {
-        model.footerLinks.insert(.init(
-            title: "Restore",
-            titleFont: model.footerLinks.first?.titleFont ?? .caption,
-            titleColor: model.footerLinks.first?.titleColor ?? .black,
-            separatorSymbol: model.footerLinks.first?.separatorSymbol ?? "•",
-            separatorSymbolColor: model.footerLinks.first?.separatorSymbolColor ?? Color.gray.opacity(0.7),
-            action: {
-                Task {
-                    let successfullyRestored = await purchaseManager.restore()
-                    if successfullyRestored {
-                        await purchaseManager.updatePurchasedProducts()
+        .onAppear {
+            purchaseManager.setSubscriptionProducts(
+                model.plans.map(
+                    {
+                        SubscriptionProduct(
+                            title: $0.id,
+                            description: nil,
+                            productId: $0.id
+                        )
                     }
-                    onRestore?(successfullyRestored)
-                }
-            }
-        ), at: .zero)
+                )
+            )
+        }
+        .zIndex(100)
     }
 }

@@ -17,9 +17,12 @@ final public class InAppPurchase: NSObject, ObservableObject {
 
     public static var shared: InAppPurchase = InAppPurchase()
 
+    /// Testing flag to set in app purchases disabled
+    public var inAppPurchasesEnabled: Bool = true
+
     /// Returns true if the user has any active purchased product
     public var hasPurchased: Bool {
-        !self.purchasedProductIDs.isEmpty
+        inAppPurchasesEnabled ? !self.purchasedProductIDs.isEmpty : true
     }
 
     // MARK: - Private Properties
@@ -61,6 +64,12 @@ final public class InAppPurchase: NSObject, ObservableObject {
         Task {
             await shared.updatePurchasedProducts()
         }
+    }
+
+    /// Enable or disable testing mode to simulate purchases
+    /// - Parameter value: When true, hasPurchased will always return true
+    public func setDisabled(_ value: Bool = true) {
+        inAppPurchasesEnabled = !value
     }
 
     /// Initiates a purchase for the product with the App Store and displays the confirmation sheet.
