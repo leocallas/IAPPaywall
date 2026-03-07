@@ -26,7 +26,10 @@ struct IAPPaywallFooterView: View {
             Button(action: {
                 Task {
                     do {
-                        let result = try await purchaseManager.purchase(selectedPlan?.id ?? "")
+                        let productId = model.trial?.isEnabled == true
+                        ? model.trial?.productId ?? ""
+                        : selectedPlan?.productId ?? ""
+                        let result = try await purchaseManager.purchase(productId)
                         onPurchase?(result, selectedPlan)
                     } catch {
                         onPurchase?(.unknownError, nil)
@@ -64,9 +67,9 @@ struct IAPPaywallFooterView: View {
                 model.plans.map(
                     {
                         SubscriptionProduct(
-                            title: $0.id,
+                            title: $0.productId,
                             description: nil,
-                            productId: $0.id
+                            productId: $0.productId
                         )
                     }
                 )

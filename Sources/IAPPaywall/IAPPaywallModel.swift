@@ -42,19 +42,19 @@ public struct IAPPaywallModel {
         }
     }
 
-    public struct Plan: Identifiable, Hashable {
-        public var id: String
+    public struct Plan: Hashable {
+        public var productId: String
         public var type: PlanType
         public var content: ((_ data: PlanData) -> AnyView)?
         public var promo: ((_ data: PlanData) -> AnyView)?
 
         public init(
-            id: String,
+            productId: String,
             type: PlanType,
             content: ((_ data: PlanData) -> AnyView)?,
             promo: ((_ data: PlanData) -> AnyView)? = nil
         ) {
-            self.id = id
+            self.productId = productId
             self.type = type
             self.content = content
             self.promo = promo
@@ -69,11 +69,11 @@ public struct IAPPaywallModel {
         }
 
         public func hash(into hasher: inout Hasher) {
-            hasher.combine(id)
+            hasher.combine(productId)
         }
 
         static public func == (lhs: IAPPaywallModel.Plan, rhs: IAPPaywallModel.Plan) -> Bool {
-            lhs.id == rhs.id
+            lhs.productId == rhs.productId
         }
     }
     
@@ -94,6 +94,7 @@ public struct IAPPaywallModel {
     }
 
     public struct Trial {
+        public var productId: String
         public var isEnabled: Bool
         public var selectPlanOnToggle: PlanType?
         public var onTitle: String
@@ -104,6 +105,7 @@ public struct IAPPaywallModel {
         public var background: AnyView?
 
         public init(
+            productId: String,
             isEnabled: Bool,
             selectPlanOnToggle: PlanType? = nil,
             onTitle: String,
@@ -113,6 +115,7 @@ public struct IAPPaywallModel {
             toggleTintColor: Color = .accentColor,
             background: AnyView? = nil
         ) {
+            self.productId = productId
             self.isEnabled = isEnabled
             self.selectPlanOnToggle = selectPlanOnToggle
             self.onTitle = onTitle

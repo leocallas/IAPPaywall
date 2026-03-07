@@ -29,7 +29,7 @@ struct IAPPaywallContentView: View {
                     }
                     .padding(.bottom, 20)
                     
-                    ForEach(model.plans) { plan in
+                    ForEach(model.plans, id: \.productId) { plan in
                         IAPPaywallPlanView(
                             purchaseManager: purchaseManager,
                             plan: plan,
@@ -85,68 +85,4 @@ struct IAPPaywallContentView: View {
             selectedPlan = model.plans.first
         }
     }
-}
-
-#Preview {
-    IAPPaywallContentView(
-        purchaseManager: .init(),
-        model: .init(
-            get: {
-                .init(
-                    payButton: .init(content: { _ in
-                        AnyView(
-                            Text("")
-                        )
-                    }),
-                    footer: .init(),
-                    plans: [
-                        .init(
-                            id: "12",
-                            type: .yearly,
-                            content: { model in
-                                AnyView(
-                                    Text("Yearly Access")
-                                )
-                            }
-                        ),
-                        .init(
-                            id: "15",
-                            type: .monthly,
-                            content: { model in
-                                AnyView(
-                                    Text("Weekly Access")
-                                )
-                            }
-                        )
-                    ],
-                    bullets: ([
-                        "123123123", "12312398", "12312398"
-                    ], font: .body, color: .black),
-                    trial: .init(
-                        isEnabled: true,
-                        onTitle: "on title"
-                    )
-                )
-            },
-            set: { _ in
-                
-            }
-        ),
-        selectedPlan: .init(
-            get: {
-                .init(
-                    id: "12",
-                    type: .yearly,
-                    content: { _ in
-                        AnyView(
-                            Text("title")
-                        )
-                    }
-                )
-            },
-            set: { _ in
-                
-            }
-        )
-    )
 }

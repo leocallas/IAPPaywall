@@ -16,11 +16,12 @@ struct IAPPaywallPlanView: View {
     var trial: IAPPaywallModel.Trial?
 
     var body: some View {
-        let product = purchaseManager.cachedProduct(for: plan.id)
+        let product = purchaseManager.cachedProduct(for: plan.productId)
+        let trialProduct = purchaseManager.cachedProduct(for: trial?.productId ?? String())
         let planData = IAPPaywallModel.Plan.PlanData(
             price: product?.localizedPrice ?? "...",
             yearWeeklyPrice: product?.formattedYearWeeklyPrice ?? "...",
-            trialDuration: product?.trialDuration ?? .zero,
+            trialDuration: trial?.isEnabled == true ? trialProduct?.trialDuration ?? .zero : .zero,
             isFreeTrialEnabled: trial?.isEnabled == true,
             isSelected: isSelected
         )
@@ -34,29 +35,4 @@ struct IAPPaywallPlanView: View {
         }
         .contentShape(Rectangle())
     }
-}
-
-#Preview {
-    IAPPaywallPlanView(
-        purchaseManager: .init(),
-        plan: .init(
-            id: "1",
-            type: .monthly,
-            content: { _ in
-                AnyView (
-                    Text("Title")
-                )
-            },
-            promo: { _ in
-                AnyView (
-                    Text("promo 24% off")
-                )
-            }
-        ),
-        isSelected: false,
-        trial: .init(
-            isEnabled: true,
-            onTitle: "title"
-        )
-    )
 }
